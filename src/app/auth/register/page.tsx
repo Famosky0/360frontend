@@ -179,4 +179,4 @@ const RegisterPage = () => {
   );
 };
 
-export default RegistePage;
+export default RegisterPage;
