@@ -62,7 +62,9 @@ const RegisterPage = () => {
     }
   }, [changing]);
 
-  const handleSubmit = async (e) => {
+  import React, { useState, useEffect, FormEvent } from "react"; // Ensure FormEvent is imported
+
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (valid && passwordMatch) {
       console.log("validating");
@@ -82,6 +84,8 @@ const RegisterPage = () => {
       console.log("Not valid or passwords do not match");
     }
 };
+
+
 
 
 
