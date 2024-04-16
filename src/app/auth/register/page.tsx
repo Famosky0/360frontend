@@ -95,7 +95,7 @@ const RegisterPage = () => {
           <div>
             <h1 className="text-3xl text-primary">Welcome Back!</h1>
             <p className="text-md text-white opacity-60 font-normal mt-1">
-              Please enter a valid email and password
+              Please enter a valid email and password for your account
             </p>
           </div>
           <form className="flex flex-col gap-4 mt-8" onSubmit={handleSubmit}>
