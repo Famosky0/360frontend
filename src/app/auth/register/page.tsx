@@ -62,18 +62,28 @@ const RegisterPage = () => {
     }
   }, [changing]);
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (valid && passwordMatch) {
       console.log("validating");
       setLoading(true);
-      await userRegistration(registrationDetails);
-      setIsRequestedOTP(true);
+      try {
+        // Perform the registration
+        await userRegistration(registrationDetails);
+        
+        // Assuming the registration is successful, redirect to the login page
+        router.push('/auth/login');
+      } catch (error) {
+        console.error('Registration failed:', error);
+        // Here you might want to set an error state and display a message to the user
+      }
       setLoading(false);
     } else {
-      console.log("not Valid");
+      console.log("Not valid or passwords do not match");
     }
-  };
+};
+
+
 
   return (
     <>
