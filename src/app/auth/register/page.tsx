@@ -62,32 +62,18 @@ const RegisterPage = () => {
     }
   }, [changing]);
 
-  import React, { useState, useEffect, FormEvent } from "react"; // Ensure FormEvent is imported
-
-const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     if (valid && passwordMatch) {
       console.log("validating");
       setLoading(true);
-      try {
-        // Perform the registration
-        await userRegistration(registrationDetails);
-        
-        // Assuming the registration is successful, redirect to the login page
-        router.push('/auth/login');
-      } catch (error) {
-        console.error('Registration failed:', error);
-        // Here you might want to set an error state and display a message to the user
-      }
+      await userRegistration(registrationDetails);
+      setIsRequestedOTP(true);
       setLoading(false);
     } else {
-      console.log("Not valid or passwords do not match");
+      console.log("not Valid");
     }
-};
-
-
-
-
+  };
 
   return (
     <>
@@ -99,7 +85,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
           <div>
             <h1 className="text-3xl text-primary">Welcome Back!</h1>
             <p className="text-md text-white opacity-60 font-normal mt-1">
-              Please enter a valid email and password for your account
+              Please enter a valid email and password
             </p>
           </div>
           <form className="flex flex-col gap-4 mt-8" onSubmit={handleSubmit}>
