@@ -15,23 +15,17 @@ const BookingProcessOne = ({
   profile: profileSchema;
   setProfile: React.Dispatch<React.SetStateAction<profileSchema>>;
 }) => {
-  const [plans, setPlans] = useState([{ name: "JASPER", price: 500 }]); // Mocked plans data
-
   const handleChange = (e: any) => {
-    let name = e.target.name;
-    let value = e.target.value;
-
-    // Update state based on input changes
-    setBookingInfo({ ...bookingInfo, [name]: value });
-
-    // Additional logic for dynamic pricing if plan is JASPER
-    if (name === "plan" && value === "JASPER") {
-      const pricePerShoot = 500; // This should come from settings or be dynamically fetched
-      setBookingInfo((prev) => ({
-        ...prev,
-        price: prev.number_of_shoot * pricePerShoot
-      }));
+    const { name, value } = e.target;
+    if (name === "shooting_date" && new Date(value) < new Date()) {
+      alert("Please select a valid date in the future.");
+      return;
     }
+    if (name === "shooting_time" && (value < "08:00" || value > "23:00")) {
+      alert("Please select a time between 08:00 and 23:00.");
+      return;
+    }
+    setBookingInfo({ ...bookingInfo, [name]: value });
   };
 
   const getUserProfile = async () => {
@@ -46,6 +40,8 @@ const BookingProcessOne = ({
 
   useEffect(() => {
     getUserProfile();
+    // Set default plan as JASPER
+    setBookingInfo(prev => ({ ...prev, plan: "JASPER" }));
   }, []);
 
   return (
@@ -56,27 +52,14 @@ const BookingProcessOne = ({
 
       <form className="flex flex-col gap-5 mt-8">
         <div>
-          <label htmlFor="plan">Plan</label>
-          <select
-            id="plan"
-            name="plan"
-            value={bookingInfo.plan}
-            onChange={handleChange}
-            className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
-          >
-            {plans.map((option) => (
-              <option key={option.name} value={option.name}>{option.name}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="number_of_shoot">Number of Shoot</label>
+          <label htmlFor="full_name">Full Name</label>
           <input
-            type="number"
-            id="number_of_shoot"
-            name="number_of_shoot"
-            value={bookingInfo["number_of_shoot"]}
-            onChange={handleChange}
+            type="text"
+            id="full_name"
+            name="full_name"
+            value={profile.first_name + " " + profile.last_name}
+            disabled
+            placeholder="Enter your Full Name"
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
@@ -88,10 +71,23 @@ const BookingProcessOne = ({
             name="phone"
             value={bookingInfo["phone"]}
             onChange={handleChange}
-            placeholder="08036399878"
             pattern="^0\d{10}$"
+            placeholder="08036399878"
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
+        </div>
+        <div>
+          <label htmlFor="plan">Plan</label>
+          <select
+            id="plan"
+            name="plan"
+            value={bookingInfo["plan"]}
+            onChange={handleChange}
+            disabled // This will grey out the select box
+            className="w-full bg-gray-200 rounded-md min-h-12 mt-1.5 p-2 text-black cursor-not-allowed"
+          >
+            <option value="JASPER">JASPER</option>
+          </select>
         </div>
         <div>
           <label htmlFor="date">Date</label>
