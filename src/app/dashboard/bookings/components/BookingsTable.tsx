@@ -31,9 +31,6 @@ const BookingsTable = ({
                 Shooting Time
               </th>
               <th scope="col" className="px-6 py-4 font-medium text-lg">
-                Plan Type
-              </th>
-              <th scope="col" className="px-6 py-4 font-medium text-lg">
                 Price
               </th>
             </tr>
@@ -60,7 +57,6 @@ const BookingsTable = ({
                       <td className="px-6 py-4">{item.delivery_status}</td>
                       <td className="px-6 py-4">{item.shooting_date}</td>
                       <td className="px-6 py-4">{item.shooting_time}</td>
-                      <td className="px-6 py-4">{item.plan}</td>
                       <td className="px-6 py-4">{`₦ ${item.price}`}</td>
                     </tr>
                   );
