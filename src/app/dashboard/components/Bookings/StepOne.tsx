@@ -15,9 +15,8 @@ const BookingProcessOne = ({
   profile: profileSchema;
   setProfile: React.Dispatch<React.SetStateAction<profileSchema>>;
 }) => {
-  const handleChange = (e: any) => {
-    let name = e.target.name;
-    let value = e.target.value;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setBookingInfo({ ...bookingInfo, [name]: value });
   };
 
@@ -38,34 +37,17 @@ const BookingProcessOne = ({
     return `${year}-${month}-${day}`;
   };
 
-  const getCurrentTime = () => {
-    const currentTime = new Date();
-    let hour: string | number = currentTime.getHours();
-    let minute: string | number = currentTime.getMinutes();
-
-    // Pad hour and minute with leading zeros if needed
-    if (hour < 10) {
-      hour = "0" + hour;
-    }
-    if (minute < 10) {
-      minute = "0" + minute;
-    }
-
-    return `${hour}:${minute}`;
-  };
-
   const getUserProfile = async () => {
-    let data = [];
-    const accessToken = localStorage.getItem("accessToken");
-    console.log("token: " + accessToken);
-    if (accessToken) {
-      data = await retrieveProfile(accessToken);
-      console.log(data);
-      if (data) {
-        setProfile(data);
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+      if (accessToken) {
+        const data = await retrieveProfile(accessToken);
+        if (data) {
+          setProfile(data);
+        }
       }
-    } else {
-      data = await retrieveProfile("string");
+    } catch (error) {
+      console.error("Error retrieving user profile:", error);
     }
   };
 
@@ -86,7 +68,7 @@ const BookingProcessOne = ({
             type="text"
             id="full_name"
             name="full_name"
-            value={profile.first_name + " " + profile.last_name}
+            value={`${profile.first_name} ${profile.last_name}`}
             disabled
             placeholder="Enter your Full Name"
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
@@ -95,10 +77,10 @@ const BookingProcessOne = ({
         <div>
           <label htmlFor="Phone_number">WhatsApp Number</label>
           <input
-            type="number"
+            type="tel"
             id="Phone_number"
             name="phone"
-            value={bookingInfo["phone"]}
+            value={bookingInfo.phone}
             onChange={handleChange}
             placeholder="+2348149055068"
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
@@ -106,26 +88,26 @@ const BookingProcessOne = ({
         </div>
 
         <div>
-          <label htmlFor="password">Date</label>
+          <label htmlFor="date">Date</label>
           <input
             type="date"
             id="date"
             name="shooting_date"
-            value={bookingInfo["shooting_date"]}
+            value={bookingInfo.shooting_date}
             onChange={handleChange}
             placeholder={getCurrentDate()}
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
         <div>
-          <label htmlFor="time">Time (when are you shooting?) </label>
+          <label htmlFor="time">Time (when are you shooting?)</label>
           <input
             type="time"
             id="time"
             name="shooting_time"
-            value={bookingInfo["shooting_time"]}
+            value={bookingInfo.shooting_time}
             onChange={handleChange}
-            placeholder={getCurrentTime()}
+            placeholder="HH:MM"
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
