@@ -18,7 +18,10 @@ const BookingProcessOne = ({
   const [errorMessage, setErrorMessage] = useState(""); // State to store error messages
 
   const handleChange = (e: any) => {
-    let { name, value } = e.target;
+    const { name, value } = e.target;
+    const today = new Date().toISOString().split('T')[0];
+    const operationalStartTime = "08:00";
+    const operationalEndTime = "23:00";
 
     // Reset error message
     if (name === "phone") {
@@ -30,16 +33,22 @@ const BookingProcessOne = ({
       }
     }
 
+    if (name === "shooting_date" && value < today) {
+      setErrorMessage("You cannot select a date in the past.");
+    } else if (name === "shooting_time" && (value < operationalStartTime || value > operationalEndTime)) {
+      setErrorMessage("Shooting time must be between 08:00 and 23:00.");
+    } else {
+      setErrorMessage(""); // Clear error messages for date and time if all checks are passed
+    }
+
     setBookingInfo({ ...bookingInfo, [name]: value });
   };
 
   const getUserProfile = async () => {
     let data = [];
     const accessToken = localStorage.getItem("accessToken");
-    console.log("token: " + accessToken);
     if (accessToken) {
       data = await retrieveProfile(accessToken);
-      console.log(data);
       if (data) {
         setProfile(data);
       }
@@ -59,6 +68,7 @@ const BookingProcessOne = ({
       </div>
 
       <form className="flex flex-col gap-5 mt-8">
+        {/* Full Name */}
         <div>
           <label htmlFor="full_name">Full Name</label>
           <input
@@ -71,6 +81,8 @@ const BookingProcessOne = ({
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
+
+        {/* Phone Number */}
         <div>
           <label htmlFor="Phone_number">Your Whatsapp Number</label>
           <input
@@ -86,18 +98,21 @@ const BookingProcessOne = ({
           {errorMessage && <div className="text-red-500 text-sm mt-2">{errorMessage}</div>}
         </div>
 
+        {/* Shooting Date */}
         <div>
-          <label htmlFor="password">Date</label>
+          <label htmlFor="date">Date</label>
           <input
             type="date"
             id="date"
             name="shooting_date"
             value={bookingInfo["shooting_date"]}
             onChange={handleChange}
-            placeholder={new Date().getTime.toString()}
+            min={new Date().toISOString().split('T')[0]} // Disallow past dates
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
+
+        {/* Shooting Time */}
         <div>
           <label htmlFor="time">Time (When are you coming for your shoot)</label>
           <input
@@ -106,7 +121,8 @@ const BookingProcessOne = ({
             name="shooting_time"
             value={bookingInfo["shooting_time"]}
             onChange={handleChange}
-            placeholder={new Date().getTime.toString()}
+            min="08:00"
+            max="23:00" // Ensure time is within operational hours
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
