@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { bookingSchema, profileSchema } from "../Interface";
-import { retrieveProfile, getOperationalHours } from "@/services/request";
+import { retrieveProfile } from "@/services/request";
 
 const BookingProcessOne = ({
   setBookingInfo,
@@ -15,94 +15,90 @@ const BookingProcessOne = ({
   profile: profileSchema;
   setProfile: React.Dispatch<React.SetStateAction<profileSchema>>;
 }) => {
-  const [phoneError, setPhoneError] = useState("");
-  const [timeError, setTimeError] = useState("");
-  const [profileData, setProfileData] = useState<profileSchema | null>(null);
+  const handleChange = (e: any) => {
+    let name = e.target.name;
+    let value = e.target.value;
+    setBookingInfo({ ...bookingInfo, [name]: value });   
+  };
+
+  const getUserProfile = async () => {
+    let data = [];
+    const accessToken = localStorage.getItem("accessToken");
+    console.log("token: " + accessToken);
+    if (accessToken) {
+      data = await retrieveProfile(accessToken);
+      console.log(data);
+      if (data) {
+        setProfile(data);
+      }
+    } else {
+      data = await retrieveProfile("string");
+    }
+  };
 
   useEffect(() => {
     getUserProfile();
   }, []);
 
-  const validatePhoneNumber = (value: string) => {
-    const pattern = /^\+234\d{10}$/;
-    return pattern.test(value);
-  };
-
-  const checkTimeAvailability = async (chosenTime: string) => {
-    const operationalHours = await getOperationalHours(); // API call to fetch operational hours
-    const { openTime, closeTime } = operationalHours; // Assuming API returns an object with openTime and closeTime
-    const chosenDate = new Date(chosenTime);
-    const openDate = new Date(`1970-01-01T${openTime}:00`);
-    const closeDate = new Date(`1970-01-01T${closeTime}:00`);
-
-    if (chosenDate >= openDate && chosenDate < closeDate) {
-      setTimeError(""); // Clear any previous error message
-    } else {
-      setTimeError("The studio will be closed at the time you selected.");
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    if (name === 'phone') {
-      if (validatePhoneNumber(value)) {
-        setBookingInfo({ ...bookingInfo, [name]: value });
-        setPhoneError("");
-      } else {
-        setPhoneError("Invalid phone number, must match +234 followed by 10 digits.");
-      }
-    } else if (name === 'time') {
-      checkTimeAvailability(value);
-      setBookingInfo({ ...bookingInfo, [name]: value });
-    } else {
-      setBookingInfo({ ...bookingInfo, [name]: value });
-    }
-  };
-
-  const getUserProfile = async () => {
-    const accessToken = localStorage.getItem("accessToken");
-    if (accessToken) {
-      const data = await retrieveProfile(accessToken);
-      if (data) {
-        setProfile(data);
-        setProfileData(data);
-      }
-    }
-  };
-
   return (
-    <form>
-      <label htmlFor="Phone_number">Provide your Whatsapp Number</label>
-      <input
-        type="tel"
-        id="Phone_number"
-        name="phone"
-        value={bookingInfo.phone}
-        onChange={handleChange}
-        placeholder="+2348149055068"
-        className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
-      />
-      {phoneError && <div className="text-red-500">{phoneError}</div>}
+    <div className="w-full flex flex-col gap-4">
+      <div className="w-full flex flex-col gap-2">
+        <h1 className="text-3xl text-primary">Create Bookings</h1>
+      </div>
 
-      <label htmlFor="booking_time">Booking Time (When are you coming for your shoot)</label>
-      <input
-        type="time"
-        id="booking_time"
-        name="time"
-        value={bookingInfo.time}
-        onChange={handleChange}
-        className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
-      />
-      {timeError && <div className="text-red-500">{timeError}</div>}
-
-      {profileData && (
+      <form className="flex flex-col gap-5 mt-8">
         <div>
-          <p>Name: {profileData.name}</p>
-          <p>Email: {profileData.email}</p>
+          <label htmlFor="full_name">Full Name</label>
+          <input
+            type="text"
+            id="full_name"
+            name="full_name"
+            value={profile.first_name + " " + profile.last_name}
+            disabled
+            placeholder="Enter your Full Name"
+            className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
+          />
         </div>
-      )}
-    </form>
+        <div>
+          <label htmlFor="Phone_number">Your Whatsapp Number</label>
+          <input
+            type="tel"
+            id="Phone_number"
+            name="phone"
+            value={bookingInfo["phone"]}
+            onChange={handleChange}
+            placeholder="+2348149055068"
+            pattern="^\+234\d{10}$"
+            className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="password">Date</label>
+          <input
+            type="date"
+            id="date"
+            name="shooting_date"
+            value={bookingInfo["shooting_date"]}
+            onChange={handleChange}
+            placeholder={new Date().getTime.toString()}
+            className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
+          />
+        </div>
+        <div>
+          <label htmlFor="time">Time (When are you coming for your shoot) </label>
+          <input
+            type="time"
+            id="time"
+            name="shooting_time"
+            value={bookingInfo["shooting_time"]}
+            onChange={handleChange}
+            placeholder={new Date().getTime.toString()}
+            className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
+          />
+        </div>
+      </form>
+    </div>
   );
 };
 
