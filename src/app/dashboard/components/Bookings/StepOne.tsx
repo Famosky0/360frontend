@@ -15,33 +15,29 @@ const BookingProcessOne = ({
   profile: profileSchema;
   setProfile: React.Dispatch<React.SetStateAction<profileSchema>>;
 }) => {
-  useEffect(() => {
-    // Automatically set the plan to 'JASPER' on component mount
-    setBookingInfo({ ...bookingInfo, plan: "JASPER" });
-
-    const getUserProfile = async () => {
-      let data = [];
-      const accessToken = localStorage.getItem("accessToken");
-      console.log("token: " + accessToken);
-      if (accessToken) {
-        data = await retrieveProfile(accessToken);
-        console.log(data);
-        if (data) {
-          setProfile(data);
-        }
-      } else {
-        data = await retrieveProfile("string");
-      }
-    };
-
-    getUserProfile();
-  }, []);
-
   const handleChange = (e: any) => {
     let name = e.target.name;
     let value = e.target.value;
     setBookingInfo({ ...bookingInfo, [name]: value });
   };
+
+  const getUserProfile = async () => {
+    let data = [];
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
+      data = await retrieveProfile(accessToken);
+      if (data) {
+        setProfile(data);
+      }
+    } else {
+      data = await retrieveProfile("defaultToken");
+    }
+  };
+
+  useEffect(() => {
+    getUserProfile();
+  }, []);
+
 
   return (
     <div className="w-full flex flex-col gap-4">
