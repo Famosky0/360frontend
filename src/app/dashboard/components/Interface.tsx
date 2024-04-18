@@ -1,42 +1,4 @@
 export interface bookingSchema {
-  phone: string;
-  plan: string;
-  shoot_type: string;
-  location: string;
-  amount: string;
-  number_of_shoot: number;
-  shooting_date: string;
-  shooting_time: string;
-}
-
-export interface profileSchema {
-  first_name: string;
-  last_name: string;
-  email: string;
-  avatar: string;
-}
-
-export interface calculateSchema {
-  number_of_shoot: number;
-}
-
-export interface photoDetails {  
-  cover_image: string;
-  delivery_date: string;  
-  id:string;
-  project_name: string;
-  url:string
-}
-
-export interface fetchBookingSchema {
-  id: string;
-  created_at: string;
-  delivery_status: string;
-  location: string;
-  number_of_shoot: number;
-  payment_status: string;
-  plan: string;
-  price: string;
   shoot_type: string;
   shooting_date: string;
   shooting_time: string;
@@ -68,7 +30,7 @@ export interface registerProps {
   first_name: string;
   last_name: string;
   email: string;
-  password: any;
+  password: any;  // 'any' type could be replaced with 'string' for better type safety.
   terms_agreement: boolean;
 }
 
@@ -79,11 +41,7 @@ export interface OTPDetails {
 
 export interface loginProps {
   email: string;
-  password: any;
+  password: any;  // As with registerProps, consider specifying 'string' instead of 'any'.
 }
 
-export interface planSchema {
-  name: string;
-  price: string;
-  desc: string;
-}
+// Removed planSchema.
