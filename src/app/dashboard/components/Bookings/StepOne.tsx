@@ -15,90 +15,76 @@ const BookingProcessOne = ({
   profile: profileSchema;
   setProfile: React.Dispatch<React.SetStateAction<profileSchema>>;
 }) => {
-  const handleChange = (e: any) => {
-    let name = e.target.name;
-    let value = e.target.value;
-    setBookingInfo({ ...bookingInfo, [name]: value });   
-  };
-
-  const getUserProfile = async () => {
-    let data = [];
-    const accessToken = localStorage.getItem("accessToken");
-    console.log("token: " + accessToken);
-    if (accessToken) {
-      data = await retrieveProfile(accessToken);
-      console.log(data);
-      if (data) {
-        setProfile(data);
-      }
-    } else {
-      data = await retrieveProfile("string");
-    }
-  };
+  const [phoneError, setPhoneError] = useState("");
+  const [profileData, setProfileData] = useState<profileSchema | null>(null);
 
   useEffect(() => {
+    // You might want to call this function when the component mounts
+    // or based on some other action, depending on your application logic.
     getUserProfile();
   }, []);
 
+  const validatePhoneNumber = (value: string) => {
+    const pattern = /^\+234\d{10}$/;
+    return pattern.test(value);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    if (name === 'phone') {
+      if (validatePhoneNumber(value)) {
+        setBookingInfo({ ...bookingInfo, [name]: value });
+        setPhoneError(""); // Clear error message
+      } else {
+        setPhoneError("Invalid phone number, must match +234 followed by 10 digits.");
+      }
+    } else {
+      setBookingInfo({ ...bookingInfo, [name]: value });
+    }
+  };
+
+  const getUserProfile = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
+      const data = await retrieveProfile(accessToken);
+      if (data) {
+        setProfile(data);
+        setProfileData(data); // Set the data in the local state
+      }
+    }
+  };
+
   return (
-    <div className="w-full flex flex-col gap-4">
-      <div className="w-full flex flex-col gap-2">
-        <h1 className="text-3xl text-primary">Create Bookings</h1>
-      </div>
+    <form>
+      {/* ... Other form elements ... */}
 
-      <form className="flex flex-col gap-5 mt-8">
-        <div>
-          <label htmlFor="full_name">Full Name</label>
-          <input
-            type="text"
-            id="full_name"
-            name="full_name"
-            value={profile.first_name + " " + profile.last_name}
-            disabled
-            placeholder="Enter your Full Name"
-            className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
-          />
-        </div>
-        <div>
-          <label htmlFor="Phone_number">Your Whatsapp Number</label>
-          <input
-            type="tel"
-            id="Phone_number"
-            name="phone"
-            value={bookingInfo["phone"]}
-            onChange={handleChange}
-            placeholder="+2348149055068"
-            pattern="^\+234\d{10}$"
-            className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
-          />
-        </div>
+      <label htmlFor="Phone_number">Phone Number</label>
+      <input
+        type="tel"
+        id="Phone_number"
+        name="phone"
+        value={bookingInfo.phone}
+        onChange={handleChange}
+        placeholder="+2348149055068"
+        className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
+      />
+      {phoneError && <div className="text-red-500">{phoneError}</div>}
 
+      {/* ... Rest of your form elements ... */}
+
+      {/* Display profile information if it has been retrieved */}
+      {profileData && (
         <div>
-          <label htmlFor="password">Date</label>
-          <input
-            type="date"
-            id="date"
-            name="shooting_date"
-            value={bookingInfo["shooting_date"]}
-            onChange={handleChange}
-            placeholder={new Date().getTime.toString()}
-            className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
-          />
+          {/* Display various parts of the profile here */}
+          <p>Name: {profileData.name}</p>
+          <p>Email: {profileData.email}</p>
+          {/* ... */}
         </div>
-        <div>
-          <label htmlFor="time">Time (When are you coming for your shoot) </label>
-          <input
-            type="time"
-            id="time"
-            name="shooting_time"
-            value={bookingInfo["shooting_time"]}
-            onChange={handleChange}
-            placeholder={new Date().getTime.toString()}
-            className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
-          />
-        </div>
-      </form>
-    </div>
+      )}
+
+      {/* ... Submit button or other controls ... */}
+    </form>
   );
 };
 
