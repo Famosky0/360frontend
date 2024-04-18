@@ -13,10 +13,7 @@ const FinalStep = ({
       title: "Name",
       value: profile.first_name + " " + profile.last_name,
     },
-    {
-      title: "Plan",
-      value: bookingInfo.plan,
-    },
+    
     {
       title: "Shoot Type",
       value: bookingInfo.shoot_type,
