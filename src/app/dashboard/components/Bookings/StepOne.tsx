@@ -34,7 +34,7 @@ const BookingProcessOne = ({ profile }) => {
           />
         </div>
         <div>
-          <label htmlFor="Phone_number">WhatssApp Number</label>
+          <label htmlFor="Phone_number">WhatsApp Number</label>
           <input
             type="tel"
             id="Phone_number"
