@@ -13,7 +13,7 @@ const BookingProcessOne = ({ setBookingInfo, bookingInfo, profile }) => {
       </div>
       <form className="flex flex-col gap-5 mt-8">
         <div>
-          <label htmlFor="Phone_number">WhatsApp Number</label>
+          <label htmlFor="Phone_number">Your WhatsApp Number</label>
           <input
             type="text"
             id="Phone_number"
