@@ -17,19 +17,24 @@ const BookingProcessOne = ({
 }) => {
   const [errorMessage, setErrorMessage] = useState(""); // State to store error messages
 
+  useEffect(() => {
+    // Set the default plan to 'JASPER' when the component mounts
+    setBookingInfo({ ...bookingInfo, plan: "JASPER" });
+    getUserProfile();
+  }, []);
+
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     const today = new Date().toISOString().split('T')[0];
     const operationalStartTime = "08:00";
     const operationalEndTime = "23:00";
 
-    // Reset error message
     if (name === "phone") {
-      const pattern = /^\+234\d{10}$/; // Example: +234 followed by 10 digits
+      const pattern = /^\+234\d{10}$/;
       if (!pattern.test(value)) {
         setErrorMessage("Invalid WhatsApp number. Must match +234 followed by 10 digits.");
       } else {
-        setErrorMessage(""); // Clear error message if pattern matches
+        setErrorMessage("");
       }
     }
 
@@ -38,7 +43,7 @@ const BookingProcessOne = ({
     } else if (name === "shooting_time" && (value < operationalStartTime || value > operationalEndTime)) {
       setErrorMessage("Shooting time must be between 08:00 and 23:00.");
     } else {
-      setErrorMessage(""); // Clear error messages for date and time if all checks are passed
+      setErrorMessage("");
     }
 
     setBookingInfo({ ...bookingInfo, [name]: value });
@@ -56,10 +61,6 @@ const BookingProcessOne = ({
       data = await retrieveProfile("string");
     }
   };
-
-  useEffect(() => {
-    getUserProfile();
-  }, []);
 
   return (
     <div className="w-full flex flex-col gap-4">
@@ -86,7 +87,7 @@ const BookingProcessOne = ({
         <div>
           <label htmlFor="Phone_number">Your Whatsapp Number</label>
           <input
-            type="number"
+            type="tel"
             id="Phone_number"
             name="phone"
             value={bookingInfo["phone"]}
@@ -107,14 +108,14 @@ const BookingProcessOne = ({
             name="shooting_date"
             value={bookingInfo["shooting_date"]}
             onChange={handleChange}
-            min={new Date().toISOString().split('T')[0]} // Disallow past dates
+            min={today} // Disallow past dates
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
 
         {/* Shooting Time */}
         <div>
-          <label htmlFor="time">Time (Whenn are you coming for your shoot)</label>
+          <label htmlFor="time">Time (When are you coming for your shoot)</label>
           <input
             type="time"
             id="time"
@@ -122,7 +123,7 @@ const BookingProcessOne = ({
             value={bookingInfo["shooting_time"]}
             onChange={handleChange}
             min="08:00"
-            max="23:00" // Ensure time is within operational hours
+            max="23:00" // Operational hours
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
