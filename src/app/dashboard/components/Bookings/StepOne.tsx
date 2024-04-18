@@ -73,7 +73,7 @@ const BookingProcessOne = ({
 
   return (
     <form>
-      <label htmlFor="Phone_number">lPhone Number</label>
+      <label htmlFor="Phone_number">Your Whatsapp Number</label>
       <input
         type="tel"
         id="Phone_number"
