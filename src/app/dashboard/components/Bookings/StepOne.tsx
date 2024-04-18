@@ -59,7 +59,7 @@ const BookingProcessOne = ({ profile }) => {
           />
         </div>
         <div>
-          <label htmlFor="time">Time (when are you shooting your picture?)</label>
+          <label htmlFor="time">Time (when are you shooting?)</label>
           <input
             type="time"
             id="time"
