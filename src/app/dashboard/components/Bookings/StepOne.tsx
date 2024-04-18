@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { bookingSchema, profileSchema } from "../Interface";
-import { retrieveProfile } from "@/services/request";
+import { retrieveProfile, getOperationalHours } from "@/services/request";
 
 const BookingProcessOne = ({
   setBookingInfo,
@@ -16,11 +16,10 @@ const BookingProcessOne = ({
   setProfile: React.Dispatch<React.SetStateAction<profileSchema>>;
 }) => {
   const [phoneError, setPhoneError] = useState("");
+  const [timeError, setTimeError] = useState("");
   const [profileData, setProfileData] = useState<profileSchema | null>(null);
 
   useEffect(() => {
-    // You might want to call this function when the component mounts
-    // or based on some other action, depending on your application logic.
     getUserProfile();
   }, []);
 
@@ -29,16 +28,33 @@ const BookingProcessOne = ({
     return pattern.test(value);
   };
 
+  const checkTimeAvailability = async (chosenTime: string) => {
+    const operationalHours = await getOperationalHours(); // API call to fetch operational hours
+    const { openTime, closeTime } = operationalHours; // Assuming API returns an object with openTime and closeTime
+    const chosenDate = new Date(chosenTime);
+    const openDate = new Date(`1970-01-01T${openTime}:00`);
+    const closeDate = new Date(`1970-01-01T${closeTime}:00`);
+
+    if (chosenDate >= openDate && chosenDate < closeDate) {
+      setTimeError(""); // Clear any previous error message
+    } else {
+      setTimeError("The studio will be closed at the time you selected.");
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
     if (name === 'phone') {
       if (validatePhoneNumber(value)) {
         setBookingInfo({ ...bookingInfo, [name]: value });
-        setPhoneError(""); // Clear error message
+        setPhoneError("");
       } else {
         setPhoneError("Invalid phone number, must match +234 followed by 10 digits.");
       }
+    } else if (name === 'time') {
+      checkTimeAvailability(value);
+      setBookingInfo({ ...bookingInfo, [name]: value });
     } else {
       setBookingInfo({ ...bookingInfo, [name]: value });
     }
@@ -50,15 +66,13 @@ const BookingProcessOne = ({
       const data = await retrieveProfile(accessToken);
       if (data) {
         setProfile(data);
-        setProfileData(data); // Set the data in the local state
+        setProfileData(data);
       }
     }
   };
 
   return (
     <form>
-      {/* ... Other form elements ... */}
-
       <label htmlFor="Phone_number">Phone Number</label>
       <input
         type="tel"
@@ -71,19 +85,23 @@ const BookingProcessOne = ({
       />
       {phoneError && <div className="text-red-500">{phoneError}</div>}
 
-      {/* ... Rest of your form elements ... */}
+      <label htmlFor="booking_time">Booking Time</label>
+      <input
+        type="time"
+        id="booking_time"
+        name="time"
+        value={bookingInfo.time}
+        onChange={handleChange}
+        className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
+      />
+      {timeError && <div className="text-red-500">{timeError}</div>}
 
-      {/* Display profile information if it has been retrieved */}
       {profileData && (
         <div>
-          {/* Display various parts of the profile here */}
           <p>Name: {profileData.name}</p>
           <p>Email: {profileData.email}</p>
-          {/* ... */}
         </div>
       )}
-
-      {/* ... Submit button or other controls ... */}
     </form>
   );
 };
