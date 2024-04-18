@@ -85,7 +85,7 @@ const BookingProcessOne = ({
       />
       {phoneError && <div className="text-red-500">{phoneError}</div>}
 
-      <label htmlFor="booking_time">Booking Time</label>
+      <label htmlFor="booking_time">Booking Time (When are you coming for your shoot)</label>
       <input
         type="time"
         id="booking_time"
