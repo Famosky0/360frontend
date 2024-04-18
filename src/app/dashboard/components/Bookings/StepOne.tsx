@@ -62,7 +62,7 @@ const BookingProcessOne = ({
         <div>
           <label htmlFor="Phone_number">Your Whatsapp Number</label>
           <input
-            type="tell"
+            type="tel"
             id="Phone_number"
             name="phone"
             value={bookingInfo["phone"]}
