@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { bookingSchema } from "../Interface";
-import { calculateAmount } from "@/services/request";
-import Loader from "@/Loader/Loader";
+import React, { useEffect, useState } from "react";
+import { calculateAmount } from "@/services/request"; // Ensure this is correctly imported
+import { bookingSchema } from "../Interface"; // Adjust path as necessary
 
 const BookingProcessOne = ({
   setBookingInfo,
@@ -16,30 +15,29 @@ const BookingProcessOne = ({
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
-    setBookingInfo({ ...bookingInfo, [name]: value });
-    if (name === "number_of_shoot" && value > 0) {
-      calculateShootAmount(value); // Trigger amount calculation when number of shoots changes
+    setBookingInfo(prev => ({ ...prev, [name]: value }));
+    if (name === 'number_of_shoot' && value > 0) {
+      calculateShootAmount(value); // Trigger calculation when number of shoots changes
     }
   };
 
   const calculateShootAmount = async (shoots: number) => {
     setLoading(true);
     try {
-      const data = await calculateAmount({
-        number_of_shoot: shoots,
-      });
-      setBookingInfo({ ...bookingInfo, amount: data.price.toString() });
+      const result = await calculateAmount({ number_of_shoot: shoots });
+      setBookingInfo(prev => ({ ...prev, amount: result.price }));
     } catch (error) {
-      console.error("Failed to calculate amount:", error);
+      console.error('Failed to calculate amount:', error);
+      setBookingInfo(prev => ({ ...prev, amount: '' }));
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    // Pre-fill the amount as empty when the component mounts or number of shoots is zero
+    // Reset amount to empty string if number of shoots is zero
     if (!bookingInfo.number_of_shoot) {
-      setBookingInfo({ ...bookingInfo, amount: "" });
+      setBookingInfo(prev => ({ ...prev, amount: "" }));
     }
   }, [bookingInfo.number_of_shoot, setBookingInfo]);
 
