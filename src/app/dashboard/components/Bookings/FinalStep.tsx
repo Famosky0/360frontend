@@ -10,10 +10,13 @@ const FinalStep = ({
 }) => {
   const PaymentDetails = [
     {
-      title: "Name",
+      title: "Bank Name",
       value: profile.first_name + " " + profile.last_name,
     },
-    
+    {
+      title: "Plan",
+      value: bookingInfo.plan,
+    },
     {
       title: "Shoot Type",
       value: bookingInfo.shoot_type,
