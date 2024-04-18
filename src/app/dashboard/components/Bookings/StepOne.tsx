@@ -15,30 +15,33 @@ const BookingProcessOne = ({
   profile: profileSchema;
   setProfile: React.Dispatch<React.SetStateAction<profileSchema>>;
 }) => {
+  useEffect(() => {
+    // Automatically set the plan to 'JASPER' on component mount
+    setBookingInfo({ ...bookingInfo, plan: "JASPER" });
+
+    const getUserProfile = async () => {
+      let data = [];
+      const accessToken = localStorage.getItem("accessToken");
+      console.log("token: " + accessToken);
+      if (accessToken) {
+        data = await retrieveProfile(accessToken);
+        console.log(data);
+        if (data) {
+          setProfile(data);
+        }
+      } else {
+        data = await retrieveProfile("string");
+      }
+    };
+
+    getUserProfile();
+  }, []);
+
   const handleChange = (e: any) => {
     let name = e.target.name;
     let value = e.target.value;
-    setBookingInfo({ ...bookingInfo, [name]: value });   
+    setBookingInfo({ ...bookingInfo, [name]: value });
   };
-
-  const getUserProfile = async () => {
-    let data = [];
-    const accessToken = localStorage.getItem("accessToken");
-    console.log("token: " + accessToken);
-    if (accessToken) {
-      data = await retrieveProfile(accessToken);
-      console.log(data);
-      if (data) {
-        setProfile(data);
-      }
-    } else {
-      data = await retrieveProfile("string");
-    }
-  };
-
-  useEffect(() => {
-    getUserProfile();
-  }, []);
 
   return (
     <div className="w-full flex flex-col gap-4">
@@ -62,16 +65,16 @@ const BookingProcessOne = ({
         <div>
           <label htmlFor="Phone_number">WhatsApp Number</label>
           <input
-            type="number"
+            type="tel"
             id="Phone_number"
             name="phone"
             value={bookingInfo["phone"]}
             onChange={handleChange}
-            placeholder="+2348149055068"
+            placeholder="08036399878"
+            pattern="^\d{11}$"
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
-
         <div>
           <label htmlFor="password">Date</label>
           <input
@@ -85,7 +88,7 @@ const BookingProcessOne = ({
           />
         </div>
         <div>
-          <label htmlFor="time">Time (when are you coming?) </label>
+          <label htmlFor="time">Time (when are you shooting?)</label>
           <input
             type="time"
             id="time"
