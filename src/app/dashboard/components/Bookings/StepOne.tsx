@@ -1,4 +1,46 @@
 "use client";
+
+import React, { useEffect, useState } from "react";
+import { bookingSchema, profileSchema } from "../Interface";
+import { retrieveProfile } from "@/services/request";
+
+const BookingProcessOne = ({
+  setBookingInfo,
+  bookingInfo,
+  profile,
+  setProfile,
+}: {
+  setBookingInfo: React.Dispatch<React.SetStateAction<bookingSchema>>;
+  bookingInfo: bookingSchema;
+  profile: profileSchema;
+  setProfile: React.Dispatch<React.SetStateAction<profileSchema>>;
+}) => {
+  const handleChange = (e: any) => {
+    let name = e.target.name;
+    let value = e.target.value;
+    setBookingInfo({ ...bookingInfo, [name]: value });   
+  };
+
+  const getUserProfile = async () => {
+    let data = [];
+    const accessToken = localStorage.getItem("accessToken");
+    console.log("token: " + accessToken);
+    if (accessToken) {
+      data = await retrieveProfile(accessToken);
+      console.log(data);
+      if (data) {
+        setProfile(data);
+      }
+    } else {
+      data = await retrieveProfile("string");
+    }
+  };
+
+  useEffect(() => {
+    getUserProfile();
+  }, []);
+
+  return (
     <div className="w-full flex flex-col gap-4">
       <div className="w-full flex flex-col gap-2">
         <h1 className="text-3xl text-primary">Create Bookings</h1>
@@ -43,7 +85,7 @@
           />
         </div>
         <div>
-          <label htmlFor="time">Time (when are you shooting?)</label>
+          <label htmlFor="time">Time (when are you shooting?) </label>
           <input
             type="time"
             id="time"
