@@ -1,27 +1,35 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import { IoArrowBackSharp } from 'react-icons/io5';
-import { LuPlus } from 'react-icons/lu'; // Assuming this is a valid icon, ensure you have the correct import for your icons.
-import BookingProcess from './BookingProcess';
-import BookingsTable from './BookingsTable';
-import RecentBookingsEmptyState from './RecentBookingsEmptyState';
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { retrieveAllUserBookings } from "@/services/request";
+import RecentBookingsEmptyState from "../components/Nothing";
+
+// Icons
+import { IoArrowBackSharp } from "react-icons/io5";
+import { LuPlus } from "react-icons/lu";
+import BookingsTable from "./components/BookingsTable";
+
+// Components
+import BookingProcess from "../components/Bookings/BookingProcess";
 
 const Bookings = () => {
   const router = useRouter();
+  const [isStartBookingProcess, setisStartBookingProcess] =
+    useState<Boolean>(false);
+  const [bookings, setBookings] = useState([]);
   const [refresh, setRefresh] = useState(false);
-  const [isStartBookingProcess, setisStartBookingProcess] = useState(false);
-  const [bookings, setBookings] = useState(null);
 
   const getRecentData = async () => {
-    // Assuming fetch logic to get booking data
-    try {
-      const response = await fetch('/api/bookings');
-      const data = await response.json();
+    let data;
+    const accessToken = localStorage.getItem("accessToken");
+    console.log("token: " + accessToken);
+    if (accessToken) {
+      data = await retrieveAllUserBookings(accessToken);
       setBookings(data);
-    } catch (error) {
-      console.error('Failed to fetch bookings:', error);
+    } else {
+      data = await retrieveAllUserBookings("string");
     }
   };
 
@@ -33,7 +41,7 @@ const Bookings = () => {
       console.log("unAuthorized");
       window.location.pathname = "/auth/login";
     }
-  }, [refresh]);
+  }, []);
 
   useEffect(() => {
     getRecentData();
@@ -57,7 +65,7 @@ const Bookings = () => {
             <div className="p-1 bg-white text-black rounded-full">
               <IoArrowBackSharp className="text-xl" />
             </div>
-            <button className="text-2xl">Bookings</button>
+            <button className="text-2xl ">Bookings</button>
           </div>
 
           <button
@@ -72,7 +80,9 @@ const Bookings = () => {
 
         <div className="w-full">
           {bookings ? (
-            <BookingsTable recentData={bookings} />
+            <>
+              <BookingsTable recentData={bookings} />
+            </>
           ) : (
             <div className="w-full my-6">
               <RecentBookingsEmptyState />
