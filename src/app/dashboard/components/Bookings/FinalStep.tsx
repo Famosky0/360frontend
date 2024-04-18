@@ -10,24 +10,20 @@ const FinalStep = ({
 }) => {
   const PaymentDetails = [
     {
-      title: "Bank Name",
+      title: "Name",
       value: profile.first_name + " " + profile.last_name,
-    },
-    {
-      title: "Plan",
-      value: bookingInfo.plan,
     },
     {
       title: "Shoot Type",
       value: bookingInfo.shoot_type,
     },
     {
-      title: "Number of shoot",
+      title: "Number of Shoots",
       value: bookingInfo.number_of_shoot,
     },
     {
       title: "Amount",
-      value: `# ${bookingInfo.amount}`,
+      value: `₦ ${bookingInfo.amount}`,
     },
     {
       title: "WhatsApp Number",
@@ -50,15 +46,13 @@ const FinalStep = ({
   return (
     <div className="w-full flex flex-col justify-between gap-12">
       <div className="w-full flex flex-col gap-4 text-white font-light">
-        <p className="text-lg text-primary font-bold">Payment Details</p>
+        <p className="text-lg text-primary font-bold">Booking Summary</p>
         {PaymentDetails.map((detail, index) =>
           detail.title === "Location" && !detail.value ? null : (
-            <>
-              <div key={index} className="flex gap-1 text-lg">
-                <p className="font-bold">{detail.title}:</p>
-                <p>{detail.value}</p>
-              </div>
-            </>
+            <div key={index} className="flex gap-1 text-lg">
+              <p className="font-bold">{detail.title}:</p>
+              <p>{detail.value}</p>
+            </div>
           )
         )}
       </div>
