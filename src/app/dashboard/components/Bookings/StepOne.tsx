@@ -60,7 +60,7 @@ const BookingProcessOne = ({
           />
         </div>
         <div>
-          <label htmlFor="Phone_number">WhatsApp Number</label>
+          <label htmlFor="Phone_number">Your Whatsapp Number</label>
           <input
             type="number"
             id="Phone_number"
@@ -85,7 +85,7 @@ const BookingProcessOne = ({
           />
         </div>
         <div>
-          <label htmlFor="time">Time (between 08:00 and 19:00) </label>
+          <label htmlFor="time">Time (When are you coming for your shoot) </label>
           <input
             type="time"
             id="time"
