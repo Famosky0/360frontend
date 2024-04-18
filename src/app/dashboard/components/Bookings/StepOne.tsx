@@ -62,12 +62,13 @@ const BookingProcessOne = ({
         <div>
           <label htmlFor="Phone_number">Your Whatsapp Number</label>
           <input
-            type="number"
+            type="tell"
             id="Phone_number"
             name="phone"
             value={bookingInfo["phone"]}
             onChange={handleChange}
             placeholder="+2348149055068"
+            pattern="^\+234\d{10}$"
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
