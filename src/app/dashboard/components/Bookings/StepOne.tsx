@@ -21,6 +21,39 @@ const BookingProcessOne = ({
     setBookingInfo({ ...bookingInfo, [name]: value });
   };
 
+  const getCurrentDate = () => {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    let month: string | number = currentDate.getMonth() + 1;
+    let day: string | number = currentDate.getDate();
+
+    // Pad month and day with leading zeros if needed
+    if (month < 10) {
+      month = "0" + month;
+    }
+    if (day < 10) {
+      day = "0" + day;
+    }
+
+    return `${year}-${month}-${day}`;
+  };
+
+  const getCurrentTime = () => {
+    const currentTime = new Date();
+    let hour: string | number = currentTime.getHours();
+    let minute: string | number = currentTime.getMinutes();
+
+    // Pad hour and minute with leading zeros if needed
+    if (hour < 10) {
+      hour = "0" + hour;
+    }
+    if (minute < 10) {
+      minute = "0" + minute;
+    }
+
+    return `${hour}:${minute}`;
+  };
+
   const getUserProfile = async () => {
     let data = [];
     const accessToken = localStorage.getItem("accessToken");
@@ -80,7 +113,7 @@ const BookingProcessOne = ({
             name="shooting_date"
             value={bookingInfo["shooting_date"]}
             onChange={handleChange}
-            placeholder={new Date().toISOString().split('T')[0]}
+            placeholder={getCurrentDate()}
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
@@ -92,7 +125,7 @@ const BookingProcessOne = ({
             name="shooting_time"
             value={bookingInfo["shooting_time"]}
             onChange={handleChange}
-            placeholder={new Date().toISOString().split('T')[1].split('.')[0]}
+            placeholder={getCurrentTime()}
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
