@@ -15,17 +15,25 @@ const BookingProcessOne = ({
   profile: profileSchema;
   setProfile: React.Dispatch<React.SetStateAction<profileSchema>>;
 }) => {
+  // Ensure initial state includes all required properties as per bookingSchema
+  const [bookingDetails, setBookingDetails] = useState<bookingSchema>({
+    phone: '',
+    plan: 'JASPER',  // Default plan set to JASPER and included in the initial state
+    shoot_type: '',
+    location: '',
+    number_of_shoot: 0,
+    amount: '',
+    shooting_date: '',
+    shooting_time: ''
+  });
+
   const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    if (name === "shooting_date" && new Date(value) < new Date()) {
-      alert("Please select a valid date in the future.");
+    let { name, value } = e.target;
+    if (name === "phone" && !/^\d{11}$/.test(value)) { // Validates Nigerian mobile numbers without country code
+      alert("Invalid phone number. Enter an 11-digit phone number.");
       return;
     }
-    if (name === "shooting_time" && (value < "08:00" || value > "23:00")) {
-      alert("Please select a time between 08:00 and 23:00.");
-      return;
-    }
-    setBookingInfo({ ...bookingInfo, [name]: value });
+    setBookingDetails(prev => ({ ...prev, [name]: value }));
   };
 
   const getUserProfile = async () => {
@@ -35,13 +43,16 @@ const BookingProcessOne = ({
       if (data) {
         setProfile(data);
       }
+    } else {
+      const data = await retrieveProfile("string");
+      if (data) {
+        setProfile(data);
+      }
     }
   };
 
   useEffect(() => {
     getUserProfile();
-    // Set default plan as JASPER
-    setBookingInfo(prev => ({ ...prev, plan: "JASPER" }));
   }, []);
 
   return (
@@ -69,9 +80,8 @@ const BookingProcessOne = ({
             type="tel"
             id="Phone_number"
             name="phone"
-            value={bookingInfo["phone"]}
+            value={bookingDetails.phone}
             onChange={handleChange}
-            pattern="^0\d{10}$"
             placeholder="08036399878"
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
@@ -81,9 +91,9 @@ const BookingProcessOne = ({
           <select
             id="plan"
             name="plan"
-            value={bookingInfo["plan"]}
+            value={bookingDetails.plan}
             onChange={handleChange}
-            disabled // This will grey out the select box
+            disabled
             className="w-full bg-gray-200 rounded-md min-h-12 mt-1.5 p-2 text-black cursor-not-allowed"
           >
             <option value="JASPER">JASPER</option>
@@ -95,7 +105,7 @@ const BookingProcessOne = ({
             type="date"
             id="date"
             name="shooting_date"
-            value={bookingInfo["shooting_date"]}
+            value={bookingDetails.shooting_date}
             onChange={handleChange}
             min={new Date().toISOString().split('T')[0]}
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
@@ -107,7 +117,7 @@ const BookingProcessOne = ({
             type="time"
             id="time"
             name="shooting_time"
-            value={bookingInfo["shooting_time"]}
+            value={bookingDetails.shooting_time}
             onChange={handleChange}
             min="08:00"
             max="23:00"
