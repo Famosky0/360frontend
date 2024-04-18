@@ -1,59 +1,33 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { bookingSchema, profileSchema } from "../Interface";
-import { retrievePlans, createBooking } from "@/services/request";
 
 const BookingProcessOne = ({
   setBookingInfo,
   bookingInfo,
   profile,
-  setProfile,
 }: {
   setBookingInfo: React.Dispatch<React.SetStateAction<bookingSchema>>;
   bookingInfo: bookingSchema;
   profile: profileSchema;
-  setProfile: React.Dispatch<React.SetStateAction<profileSchema>>;
 }) => {
-  const [plans, setPlans] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    // Fetch plans when component mounts
-    const fetchPlans = async () => {
-      const fetchedPlans = await retrievePlans();
-      setPlans(fetchedPlans);
-      setBookingInfo(info => ({ ...info, plan: 'JASPER' })); // Default to 'JASPER' plan
-    };
-    fetchPlans();
-  }, []);
-
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+
+    // Reset error message on input change
+    setErrorMessage("");
+
     if (name === "phone") {
-      const pattern = /^\+234\d{10}$/;
+      const pattern = /^\d{11}$/; // Matches 11 digits
       if (!pattern.test(value)) {
-        setErrorMessage("Invalid WhatsApp number. Must match +234 followed by 10 digits.");
-      } else {
-        setErrorMessage("");
+        setErrorMessage("Invalid WhatsApp number. Enter an 11-digit phone number without spaces or codes.");
       }
     }
-    setBookingInfo(prev => ({ ...prev, [name]: value }));
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const response = await createBooking(bookingInfo);
-      alert('Booking created successfully!');
-      console.log(response.data);
-    } catch (error) {
-      console.error(error);
-      alert('Failed to create booking. Please check your input.');
-    }
-    setLoading(false);
+    setBookingInfo({ ...bookingInfo, [name]: value });
   };
 
   return (
@@ -62,7 +36,7 @@ const BookingProcessOne = ({
         <h1 className="text-3xl text-primary">Create Bookings</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5 mt-8">
+      <form className="flex flex-col gap-5 mt-8">
         {/* Full Name */}
         <div>
           <label htmlFor="full_name">Full Name</label>
@@ -79,15 +53,15 @@ const BookingProcessOne = ({
 
         {/* Phone Number */}
         <div>
-          <label htmlFor="Phone_number">Your Whatsapp Number</label>
+          <label htmlFor="Phone_number">Your WhatsApp Number</label>
           <input
             type="tel"
             id="Phone_number"
             name="phone"
             value={bookingInfo["phone"]}
             onChange={handleChange}
-            placeholder="+2348149055068"
-            pattern="^\+234\d{10}$"
+            placeholder="08036300284"
+            pattern="^\d{11}$"
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
           {errorMessage && <div className="text-red-500 text-sm mt-2">{errorMessage}</div>}
@@ -122,9 +96,20 @@ const BookingProcessOne = ({
           />
         </div>
 
-        <button type="submit" disabled={loading} className="bg-blue-500 text-white p-2 rounded">
-          {loading ? 'Creating Booking...' : 'Create Booking'}
-        </button>
+        {/* Plan Selection - Disabled and set to JASPER */}
+        <div>
+          <label htmlFor="plan">Plan</label>
+          <select
+            id="plan"
+            name="plan"
+            value="JASPER" // Set to JASPER by default
+            onChange={handleChange}
+            disabled={true} // Disable selection
+            className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black opacity-50 cursor-not-allowed"
+          >
+            <option value="JASPER">JASPER</option>
+          </select>
+        </div>
       </form>
     </div>
   );
