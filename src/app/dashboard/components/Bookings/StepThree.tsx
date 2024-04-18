@@ -15,38 +15,31 @@ const BookingProcessOne = ({
   const handleChange = (e: any) => {
     let name = e.target.name;
     let value = e.target.value;
-    if (name === "shoot_type" && value === "indoor") {
-      setBookingInfo({ ...bookingInfo, location: "", [name]: value });
-    } else {
-      setBookingInfo({ ...bookingInfo, [name]: value });
-    }
+    setBookingInfo({ ...bookingInfo, [name]: value });
   };
 
   const [loading, setLoading] = useState(false);
 
   const calculateShootAmount = async () => {
-    let data = [];
-    const accessToken = localStorage.getItem("accessToken");
-    if (accessToken) {
+    if (bookingInfo.number_of_shoot > 0) { // Ensure that calculation is relevant
+      const accessToken = localStorage.getItem("accessToken") || "defaultAccessToken";
       setLoading(true);
-      data = await calculateAmount(accessToken, {
-        number_of_shoot: bookingInfo["number_of_shoot"],
-      });
-      setLoading(false);
-      if (data) {
-        console.log(data);
+      try {
+        const data = await calculateAmount(accessToken, {
+          number_of_shoot: bookingInfo["number_of_shoot"],
+        });
         setBookingInfo({ ...bookingInfo, amount: data.price });
+      } catch (error) {
+        console.error("Failed to calculate amount:", error);
+      } finally {
+        setLoading(false);
       }
-    } else {
-      data = await calculateAmount("string", {
-        number_of_shoot: bookingInfo["number_of_shoot"],
-      });
     }
   };
 
   useEffect(() => {
-    setBookingInfo({ ...bookingInfo, amount: "" });
-  }, [bookingInfo["number_of_shoot"]]);
+    calculateShootAmount(); // Call calculation when number_of_shoot changes
+  }, [bookingInfo.number_of_shoot]);
 
   return (
     <div className="w-full flex flex-col gap-4">
@@ -74,8 +67,9 @@ const BookingProcessOne = ({
             type="number"
             id="no_of_shoot"
             name="number_of_shoot"
-            placeholder="e.g 20"
+            value={bookingInfo.number_of_shoot}
             onChange={handleChange}
+            placeholder="e.g., 20"
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
@@ -83,38 +77,18 @@ const BookingProcessOne = ({
         <div>
           <div className="w-full flex items-center gap-[10px]">
             <label htmlFor="Phone_number">Amount</label>
-            <button
-              type="button"
-              onClick={() => {
-                if (bookingInfo["number_of_shoot"] > 0) {
-                  calculateShootAmount();
-                }
-              }}
-              className="bg-primary text-white px-2 py-1 rounded-md"
-            >
-              {loading ? (
-                <>
-                  <div className="w-full flex items-center gap-[5px]">
-                    <Loader /> <p>Calculate</p>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p>Calculate</p>
-                </>
-              )}
-            </button>
+            <input
+              type="text"
+              id="amount"
+              name="amount"
+              value={bookingInfo["amount"] || 'Calculating...'}
+              disabled
+              className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
+            />
+            {loading && <Loader />}
           </div>
-          <input
-            type="number"
-            id="amount"
-            name="amount"
-            value={bookingInfo["amount"]}
-            disabled
-            placeholder="Enter number of shoot to get amount"
-            className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
-          />
         </div>
+        
         {bookingInfo["shoot_type"].toLowerCase() === "outdoor" && (
           <div>
             <label htmlFor="password">Location</label>
@@ -124,7 +98,7 @@ const BookingProcessOne = ({
               name="location"
               value={bookingInfo["location"]}
               onChange={handleChange}
-              placeholder="e.g lagos"
+              placeholder="e.g., Lagos"
               className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
             />
           </div>
