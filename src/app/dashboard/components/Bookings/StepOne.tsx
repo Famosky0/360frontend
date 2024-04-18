@@ -18,7 +18,7 @@ const BookingProcessOne = ({
   const handleChange = (e: any) => {
     let name = e.target.name;
     let value = e.target.value;
-    setBookingInfo({ ...bookingInfo, [name]: value });   
+    setBookingInfo({ ...bookingInfo, [name]: value });
   };
 
   const getUserProfile = async () => {
@@ -80,7 +80,7 @@ const BookingProcessOne = ({
             name="shooting_date"
             value={bookingInfo["shooting_date"]}
             onChange={handleChange}
-            placeholder={new Date().getTime.toString()}
+            placeholder={new Date().toISOString().split('T')[0]}
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
@@ -92,7 +92,7 @@ const BookingProcessOne = ({
             name="shooting_time"
             value={bookingInfo["shooting_time"]}
             onChange={handleChange}
-            placeholder={new Date().getTime.toString()}
+            placeholder={new Date().toISOString().split('T')[1].split('.')[0]}
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
