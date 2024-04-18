@@ -15,39 +15,24 @@ const BookingProcessOne = ({
   profile: profileSchema;
   setProfile: React.Dispatch<React.SetStateAction<profileSchema>>;
 }) => {
-  // Ensure initial state includes all required properties as per bookingSchema
-  const [bookingDetails, setBookingDetails] = useState<bookingSchema>({
-    phone: '',
-    plan: 'JASPER',  // Default plan set to JASPER and included in the initial state
-    shoot_type: '',
-    location: '',
-    number_of_shoot: 0,
-    amount: '',
-    shooting_date: '',
-    shooting_time: ''
-  });
-
   const handleChange = (e: any) => {
-    let { name, value } = e.target;
-    if (name === "phone" && !/^\d{11}$/.test(value)) { // Validates Nigerian mobile numbers without country code
-      alert("Invalid phone number. Enter an 11-digit phone number.");
-      return;
-    }
-    setBookingDetails(prev => ({ ...prev, [name]: value }));
+    let name = e.target.name;
+    let value = e.target.value;
+    setBookingInfo({ ...bookingInfo, [name]: value });   
   };
 
   const getUserProfile = async () => {
+    let data = [];
     const accessToken = localStorage.getItem("accessToken");
+    console.log("token: " + accessToken);
     if (accessToken) {
-      const data = await retrieveProfile(accessToken);
+      data = await retrieveProfile(accessToken);
+      console.log(data);
       if (data) {
         setProfile(data);
       }
     } else {
-      const data = await retrieveProfile("string");
-      if (data) {
-        setProfile(data);
-      }
+      data = await retrieveProfile("string");
     }
   };
 
@@ -77,50 +62,37 @@ const BookingProcessOne = ({
         <div>
           <label htmlFor="Phone_number">WhatsApp Number</label>
           <input
-            type="tel"
+            type="number"
             id="Phone_number"
             name="phone"
-            value={bookingDetails.phone}
+            value={bookingInfo["phone"]}
             onChange={handleChange}
-            placeholder="08036399878"
+            placeholder="+2348149055068"
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
+
         <div>
-          <label htmlFor="plan">Plan</label>
-          <select
-            id="plan"
-            name="plan"
-            value={bookingDetails.plan}
-            onChange={handleChange}
-            disabled
-            className="w-full bg-gray-200 rounded-md min-h-12 mt-1.5 p-2 text-black cursor-not-allowed"
-          >
-            <option value="JASPER">JASPER</option>
-          </select>
-        </div>
-        <div>
-          <label htmlFor="date">Date</label>
+          <label htmlFor="password">Date</label>
           <input
             type="date"
             id="date"
             name="shooting_date"
-            value={bookingDetails.shooting_date}
+            value={bookingInfo["shooting_date"]}
             onChange={handleChange}
-            min={new Date().toISOString().split('T')[0]}
+            placeholder={new Date().getTime.toString()}
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
         <div>
-          <label htmlFor="time">Time (When are you coming for your shoot)</label>
+          <label htmlFor="time">Time (when are you shooting?) </label>
           <input
             type="time"
             id="time"
             name="shooting_time"
-            value={bookingDetails.shooting_time}
+            value={bookingInfo["shooting_time"]}
             onChange={handleChange}
-            min="08:00"
-            max="23:00"
+            placeholder={new Date().getTime.toString()}
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
