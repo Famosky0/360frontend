@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { bookingSchema, profileSchema } from "../Interface";
-import { retrieveProfile } from "@/services/request";
+import { retrievePlans, createBooking } from "@/services/request";
 
 const BookingProcessOne = ({
   setBookingInfo,
@@ -15,51 +15,46 @@ const BookingProcessOne = ({
   profile: profileSchema;
   setProfile: React.Dispatch<React.SetStateAction<profileSchema>>;
 }) => {
-  const [errorMessage, setErrorMessage] = useState(""); // State to store error messages
+  const [plans, setPlans] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: any) => {
+  useEffect(() => {
+    // Fetch plans when component mounts
+    const fetchPlans = async () => {
+      const fetchedPlans = await retrievePlans();
+      setPlans(fetchedPlans);
+      setBookingInfo(info => ({ ...info, plan: 'JASPER' })); // Default to 'JASPER' plan
+    };
+    fetchPlans();
+  }, []);
+
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    const today = new Date().toISOString().split('T')[0];
-    const operationalStartTime = "08:00";
-    const operationalEndTime = "23:00";
-
-    // Reset error message
     if (name === "phone") {
-      const pattern = /^\+234\d{10}$/; // Example: +234 followed by 10 digits
+      const pattern = /^\+234\d{10}$/;
       if (!pattern.test(value)) {
         setErrorMessage("Invalid WhatsApp number. Must match +234 followed by 10 digits.");
       } else {
-        setErrorMessage(""); // Clear error message if pattern matches
+        setErrorMessage("");
       }
     }
-
-    if (name === "shooting_date" && value < today) {
-      setErrorMessage("You cannot select a date in the past.");
-    } else if (name === "shooting_time" && (value < operationalStartTime || value > operationalEndTime)) {
-      setErrorMessage("Shooting time must be between 08:00 and 23:00.");
-    } else {
-      setErrorMessage(""); // Clear error messages for date and time if all checks are passed
-    }
-
-    setBookingInfo({ ...bookingInfo, [name]: value });
+    setBookingInfo(prev => ({ ...prev, [name]: value }));
   };
 
-  const getUserProfile = async () => {
-    let data = [];
-    const accessToken = localStorage.getItem("accessToken");
-    if (accessToken) {
-      data = await retrieveProfile(accessToken);
-      if (data) {
-        setProfile(data);
-      }
-    } else {
-      data = await retrieveProfile("string");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await createBooking(bookingInfo);
+      alert('Booking created successfully!');
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+      alert('Failed to create booking. Please check your input.');
     }
+    setLoading(false);
   };
-
-  useEffect(() => {
-    getUserProfile();
-  }, []);
 
   return (
     <div className="w-full flex flex-col gap-4">
@@ -67,7 +62,7 @@ const BookingProcessOne = ({
         <h1 className="text-3xl text-primary">Create Bookings</h1>
       </div>
 
-      <form className="flex flex-col gap-5 mt-8">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5 mt-8">
         {/* Full Name */}
         <div>
           <label htmlFor="full_name">Full Name</label>
@@ -126,6 +121,10 @@ const BookingProcessOne = ({
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
+
+        <button type="submit" disabled={loading} className="bg-blue-500 text-white p-2 rounded">
+          {loading ? 'Creating Booking...' : 'Create Booking'}
+        </button>
       </form>
     </div>
   );
