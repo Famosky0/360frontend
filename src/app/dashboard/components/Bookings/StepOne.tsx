@@ -85,7 +85,7 @@ const BookingProcessOne = ({
           />
         </div>
         <div>
-          <label htmlFor="time">Time (when are you shooting?) </label>
+          <label htmlFor="time">Time (when are you coming?) </label>
           <input
             type="time"
             id="time"
