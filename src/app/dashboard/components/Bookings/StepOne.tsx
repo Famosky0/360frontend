@@ -18,7 +18,7 @@ const BookingProcessOne = ({ profile }) => {
 
   return (
     <div className="w-full flex flex-col gap-2">
-      <h1 className="text-3xl text-primary">Create Bookings</h1>
+      <h1 className="text-3xl text-primary">Create your Bookings</h1>
 
       <form className="flex flex-col gap-5 mt-8">
         <div>
