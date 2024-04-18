@@ -1,44 +1,42 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
-import { calculateAmount } from "@/services/request"; // Ensure this is correctly imported
-import { bookingSchema } from "../Interface"; // Adjust path as necessary
+import React, { useState, useEffect } from "react";
+import { bookingSchema } from "../Interface";
+import { calculateAmount } from "@/services/request";
+import Loader from "@/Loader/Loader";
 
 const BookingProcessOne = ({
   setBookingInfo,
   bookingInfo,
-}: {
-  setBookingInfo: React.Dispatch<React.SetStateAction<bookingSchema>>;
-  bookingInfo: bookingSchema;
 }) => {
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    // Clear location if shoot type is indoor
+    if (name === "shoot_type" && value === "indoor") {
+      setBookingInfo({ ...bookingInfo, location: "", [name]: value });
+    } else {
+      setBookingInfo({ ...bookingInfo, [name]: value });
+    }
+  };
+
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    setBookingInfo(prev => ({ ...prev, [name]: value }));
-    if (name === 'number_of_shoot' && value > 0) {
-      calculateShootAmount(value); // Trigger calculation when number of shoots changes
-    }
-  };
-
-  const calculateShootAmount = async (shoots: number) => {
+  const calculateShootAmount = async () => {
     setLoading(true);
     try {
-      const result = await calculateAmount({ number_of_shoot: shoots });
-      setBookingInfo(prev => ({ ...prev, amount: result.price }));
+      const data = await calculateAmount({
+        number_of_shoot: bookingInfo.number_of_shoot,
+      });
+      if (data && data.price) {
+        setBookingInfo({ ...bookingInfo, amount: data.price });
+      }
     } catch (error) {
       console.error('Failed to calculate amount:', error);
-      setBookingInfo(prev => ({ ...prev, amount: '' }));
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
+  // Reset amount whenever the number of shoots changes
   useEffect(() => {
-    // Reset amount to empty string if number of shoots is zero
-    if (!bookingInfo.number_of_shoot) {
-      setBookingInfo(prev => ({ ...prev, amount: "" }));
-    }
+    setBookingInfo(prev => ({ ...prev, amount: "" }));
   }, [bookingInfo.number_of_shoot, setBookingInfo]);
 
   return (
@@ -69,21 +67,32 @@ const BookingProcessOne = ({
             name="number_of_shoot"
             value={bookingInfo.number_of_shoot}
             onChange={handleChange}
-            placeholder="e.g 20"
+            placeholder="e.g., 20"
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
-        <div>
+
+        <div className="w-full flex items-center gap-[10px]">
           <label htmlFor="amount">Amount</label>
-          <input
-            type="text"
-            id="amount"
-            name="amount"
-            value={loading ? "Calculating..." : bookingInfo.amount || ''}
-            disabled
-            className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
-          />
+          <button
+            type="button"
+            onClick={calculateShootAmount}
+            disabled={bookingInfo.number_of_shoot <= 0 || loading}
+            className="bg-primary text-white px-2 py-1 rounded-md"
+          >
+            {loading ? <Loader /> : "Calculate"}
+          </button>
         </div>
+        <input
+          type="text"
+          id="amount"
+          name="amount"
+          value={bookingInfo.amount || ''}
+          disabled
+          placeholder="Amount will be displayed here"
+          className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
+        />
+
         {bookingInfo.shoot_type.toLowerCase() === "outdoor" && (
           <div>
             <label htmlFor="location">Location</label>
@@ -93,7 +102,7 @@ const BookingProcessOne = ({
               name="location"
               value={bookingInfo.location}
               onChange={handleChange}
-              placeholder="e.g Lagos"
+              placeholder="e.g., Lagos"
               className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
             />
           </div>
