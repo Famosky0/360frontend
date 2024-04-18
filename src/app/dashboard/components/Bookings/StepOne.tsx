@@ -24,13 +24,15 @@ const BookingProcessOne = ({
   const getUserProfile = async () => {
     let data = [];
     const accessToken = localStorage.getItem("accessToken");
+    console.log("token: " + accessToken);
     if (accessToken) {
       data = await retrieveProfile(accessToken);
+      console.log(data);
       if (data) {
         setProfile(data);
       }
     } else {
-      data = await retrieveProfile("defaultToken");
+      data = await retrieveProfile("string");
     }
   };
 
@@ -60,12 +62,12 @@ const BookingProcessOne = ({
         <div>
           <label htmlFor="Phone_number">WhatsApp Number</label>
           <input
-            type="number"
+            type="text"  // Changed from number to text to accept the leading zero in the phone number.
             id="Phone_number"
             name="phone"
             value={bookingInfo["phone"]}
             onChange={handleChange}
-            placeholder="+2348149055068"
+            placeholder="08036399878"  // Placeholder updated to show correct format
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
