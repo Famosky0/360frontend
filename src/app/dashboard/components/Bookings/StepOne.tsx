@@ -86,7 +86,7 @@ const BookingProcessOne = ({
         <div>
           <label htmlFor="Phone_number">Your Whatsapp Number</label>
           <input
-            type="tel"
+            type="number"
             id="Phone_number"
             name="phone"
             value={bookingInfo["phone"]}
@@ -114,7 +114,7 @@ const BookingProcessOne = ({
 
         {/* Shooting Time */}
         <div>
-          <label htmlFor="time">Time (When are you coming for your shoot)</label>
+          <label htmlFor="time">Time (Whenn are you coming for your shoot)</label>
           <input
             type="time"
             id="time"
