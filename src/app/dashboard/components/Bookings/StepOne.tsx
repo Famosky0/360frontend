@@ -15,45 +15,19 @@ const BookingProcessOne = ({
   profile: profileSchema;
   setProfile: React.Dispatch<React.SetStateAction<profileSchema>>;
 }) => {
-  const [errorMessage, setErrorMessage] = useState(""); // State to store error messages
-
-  useEffect(() => {
-    // Set the default plan to 'JASPER' when the component mounts
-    setBookingInfo({ ...bookingInfo, plan: "JASPER" });
-    getUserProfile();
-  }, []);
-
   const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    const today = new Date().toISOString().split('T')[0];
-    const operationalStartTime = "08:00";
-    const operationalEndTime = "23:00";
-
-    if (name === "phone") {
-      const pattern = /^\+234\d{10}$/;
-      if (!pattern.test(value)) {
-        setErrorMessage("Invalid WhatsApp number. Must match +234 followed by 10 digits.");
-      } else {
-        setErrorMessage("");
-      }
-    }
-
-    if (name === "shooting_date" && value < today) {
-      setErrorMessage("You cannot select a date in the past.");
-    } else if (name === "shooting_time" && (value < operationalStartTime || value > operationalEndTime)) {
-      setErrorMessage("Shooting time must be between 08:00 and 23:00.");
-    } else {
-      setErrorMessage("");
-    }
-
-    setBookingInfo({ ...bookingInfo, [name]: value });
+    let name = e.target.name;
+    let value = e.target.value;
+    setBookingInfo({ ...bookingInfo, [name]: value });   
   };
 
   const getUserProfile = async () => {
     let data = [];
     const accessToken = localStorage.getItem("accessToken");
+    console.log("token: " + accessToken);
     if (accessToken) {
       data = await retrieveProfile(accessToken);
+      console.log(data);
       if (data) {
         setProfile(data);
       }
@@ -62,6 +36,10 @@ const BookingProcessOne = ({
     }
   };
 
+  useEffect(() => {
+    getUserProfile();
+  }, []);
+
   return (
     <div className="w-full flex flex-col gap-4">
       <div className="w-full flex flex-col gap-2">
@@ -69,7 +47,6 @@ const BookingProcessOne = ({
       </div>
 
       <form className="flex flex-col gap-5 mt-8">
-        {/* Full Name */}
         <div>
           <label htmlFor="full_name">Full Name</label>
           <input
@@ -82,48 +59,40 @@ const BookingProcessOne = ({
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
-
-        {/* Phone Number */}
         <div>
-          <label htmlFor="Phone_number">Your Whatsapp Number</label>
+          <label htmlFor="Phone_number">WhatsApp Number</label>
           <input
-            type="tel"
+            type="number"
             id="Phone_number"
             name="phone"
             value={bookingInfo["phone"]}
             onChange={handleChange}
             placeholder="+2348149055068"
-            pattern="^\+234\d{10}$"
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
-          {errorMessage && <div className="text-red-500 text-sm mt-2">{errorMessage}</div>}
         </div>
 
-        {/* Shooting Date */}
         <div>
-          <label htmlFor="date">Date</label>
+          <label htmlFor="password">Date</label>
           <input
             type="date"
             id="date"
             name="shooting_date"
             value={bookingInfo["shooting_date"]}
             onChange={handleChange}
-            min={today} // Disallow past dates
+            placeholder={new Date().getTime.toString()}
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
-
-        {/* Shooting Time */}
         <div>
-          <label htmlFor="time">Time (When are you coming for your shoot)</label>
+          <label htmlFor="time">Time (when are you shooting?) </label>
           <input
             type="time"
             id="time"
             name="shooting_time"
             value={bookingInfo["shooting_time"]}
             onChange={handleChange}
-            min="08:00"
-            max="23:00" // Operational hours
+            placeholder={new Date().getTime.toString()}
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
