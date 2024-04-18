@@ -21,7 +21,7 @@ const BookingProcessOne = ({
   const [loading, setLoading] = useState(false);
 
   const calculateShootAmount = async () => {
-    if (bookingInfo.number_of_shoot > 0) { // Ensure that calculation is relevant
+    if (bookingInfo.number_of_shoot > 0) {
       const accessToken = localStorage.getItem("accessToken") || "defaultAccessToken";
       setLoading(true);
       try {
@@ -38,7 +38,11 @@ const BookingProcessOne = ({
   };
 
   useEffect(() => {
-    calculateShootAmount(); // Call calculation when number_of_shoot changes
+    if (bookingInfo.number_of_shoot > 0) {
+      calculateShootAmount();
+    } else {
+      setBookingInfo({ ...bookingInfo, amount: "" }); // Clear amount when shoots are not specified
+    }
   }, [bookingInfo.number_of_shoot]);
 
   return (
@@ -61,8 +65,9 @@ const BookingProcessOne = ({
             <option>INDOOR</option>
           </select>
         </div>
+
         <div>
-          <label htmlFor="Phone_number">Number of Shoot</label>
+          <label htmlFor="no_of_shoot">Number of Shoot</label>
           <input
             type="number"
             id="no_of_shoot"
@@ -75,23 +80,21 @@ const BookingProcessOne = ({
         </div>
 
         <div>
-          <div className="w-full flex items-center gap-[10px]">
-            <label htmlFor="Phone_number">Amount</label>
-            <input
-              type="text"
-              id="amount"
-              name="amount"
-              value={bookingInfo["amount"] || 'Calculating...'}
-              disabled
-              className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
-            />
-            {loading && <Loader />}
-          </div>
+          <label htmlFor="amount">Amount</label>
+          <input
+            type="text"
+            id="amount"
+            name="amount"
+            value={bookingInfo["amount"] || (bookingInfo.number_of_shoot > 0 ? 'Calculating...' : '')}
+            disabled
+            className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
+          />
+          {loading && <Loader />}
         </div>
-        
+
         {bookingInfo["shoot_type"].toLowerCase() === "outdoor" && (
           <div>
-            <label htmlFor="password">Location</label>
+            <label htmlFor="location">Location</label>
             <input
               type="text"
               id="location"
