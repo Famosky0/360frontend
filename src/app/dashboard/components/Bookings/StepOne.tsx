@@ -1,34 +1,52 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { bookingSchema, profileSchema } from "../Interface";
+import { retrieveProfile } from "@/services/request";
 
 const BookingProcessOne = ({
   setBookingInfo,
   bookingInfo,
   profile,
+  setProfile,
 }: {
   setBookingInfo: React.Dispatch<React.SetStateAction<bookingSchema>>;
   bookingInfo: bookingSchema;
   profile: profileSchema;
+  setProfile: React.Dispatch<React.SetStateAction<profileSchema>>;
 }) => {
-  const [errorMessage, setErrorMessage] = useState("");
+  const [plans, setPlans] = useState([{ name: "JASPER", price: 500 }]); // Mocked plans data
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+  const handleChange = (e: any) => {
+    let name = e.target.name;
+    let value = e.target.value;
 
-    // Reset error message on input change
-    setErrorMessage("");
+    // Update state based on input changes
+    setBookingInfo({ ...bookingInfo, [name]: value });
 
-    if (name === "phone") {
-      const pattern = /^\d{11}$/; // Matches 11 digits
-      if (!pattern.test(value)) {
-        setErrorMessage("Invalid WhatsApp number. Enter an 11-digit phone number without spaces or codes.");
+    // Additional logic for dynamic pricing if plan is JASPER
+    if (name === "plan" && value === "JASPER") {
+      const pricePerShoot = 500; // This should come from settings or be dynamically fetched
+      setBookingInfo((prev) => ({
+        ...prev,
+        price: prev.number_of_shoot * pricePerShoot
+      }));
+    }
+  };
+
+  const getUserProfile = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
+      const data = await retrieveProfile(accessToken);
+      if (data) {
+        setProfile(data);
       }
     }
-
-    setBookingInfo({ ...bookingInfo, [name]: value });
   };
+
+  useEffect(() => {
+    getUserProfile();
+  }, []);
 
   return (
     <div className="w-full flex flex-col gap-4">
@@ -37,37 +55,44 @@ const BookingProcessOne = ({
       </div>
 
       <form className="flex flex-col gap-5 mt-8">
-        {/* Full Name */}
         <div>
-          <label htmlFor="full_name">Full Name</label>
+          <label htmlFor="plan">Plan</label>
+          <select
+            id="plan"
+            name="plan"
+            value={bookingInfo.plan}
+            onChange={handleChange}
+            className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
+          >
+            {plans.map((option) => (
+              <option key={option.name} value={option.name}>{option.name}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="number_of_shoot">Number of Shoot</label>
           <input
-            type="text"
-            id="full_name"
-            name="full_name"
-            value={profile.first_name + " " + profile.last_name}
-            disabled
-            placeholder="Enter your Full Name"
+            type="number"
+            id="number_of_shoot"
+            name="number_of_shoot"
+            value={bookingInfo["number_of_shoot"]}
+            onChange={handleChange}
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
-
-        {/* Phone Number */}
         <div>
-          <label htmlFor="Phone_number">Your WhatsApp Number</label>
+          <label htmlFor="Phone_number">WhatsApp Number</label>
           <input
             type="tel"
             id="Phone_number"
             name="phone"
             value={bookingInfo["phone"]}
             onChange={handleChange}
-            placeholder="08036300284"
-            pattern="^\d{11}$"
+            placeholder="08036399878"
+            pattern="^0\d{10}$"
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
-          {errorMessage && <div className="text-red-500 text-sm mt-2">{errorMessage}</div>}
         </div>
-
-        {/* Shooting Date */}
         <div>
           <label htmlFor="date">Date</label>
           <input
@@ -76,12 +101,10 @@ const BookingProcessOne = ({
             name="shooting_date"
             value={bookingInfo["shooting_date"]}
             onChange={handleChange}
-            min={new Date().toISOString().split('T')[0]} // Disallow past dates
+            min={new Date().toISOString().split('T')[0]}
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
-
-        {/* Shooting Time */}
         <div>
           <label htmlFor="time">Time (When are you coming for your shoot)</label>
           <input
@@ -91,24 +114,9 @@ const BookingProcessOne = ({
             value={bookingInfo["shooting_time"]}
             onChange={handleChange}
             min="08:00"
-            max="23:00" // Ensure time is within operational hours
+            max="23:00"
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
-        </div>
-
-        {/* Plan Selection - Disabled and set to JASPER */}
-        <div>
-          <label htmlFor="plan">Plan</label>
-          <select
-            id="plan"
-            name="plan"
-            value="JASPER" // Set to JASPER by default
-            onChange={handleChange}
-            disabled={true} // Disable selection
-            className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black opacity-50 cursor-not-allowed"
-          >
-            <option value="JASPER">JASPER</option>
-          </select>
         </div>
       </form>
     </div>
