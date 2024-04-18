@@ -10,7 +10,7 @@ const FinalStep = ({
 }) => {
   const PaymentDetails = [
     {
-      title: "Bank Name",
+      title: "Name",
       value: profile.first_name + " " + profile.last_name,
     },
     {
