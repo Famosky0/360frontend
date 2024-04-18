@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { bookingSchema } from "../Interface";
 import { calculateAmount } from "@/services/request";
 import Loader from "@/Loader/Loader";
@@ -12,30 +12,36 @@ const BookingProcessOne = ({
   setBookingInfo: React.Dispatch<React.SetStateAction<bookingSchema>>;
   bookingInfo: bookingSchema;
 }) => {
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e: any) => {
     const { name, value } = e.target;
-    setBookingInfo(prev => ({ ...prev, [name]: value }));
-    if (name === "number_of_shoot" && parseInt(value) > 0) {
-      calculateShootAmount(parseInt(value));
+    setBookingInfo({ ...bookingInfo, [name]: value });
+    if (name === "number_of_shoot" && value > 0) {
+      calculateShootAmount(value); // Trigger amount calculation when number of shoots changes
     }
   };
 
-  const [loading, setLoading] = useState(false);
-
-  // Triggered whenever number of shoots changes
-  const calculateShootAmount = async (number_of_shoot: number) => {
+  const calculateShootAmount = async (shoots: number) => {
     setLoading(true);
-    const accessToken = localStorage.getItem("accessToken") || "defaultAccessToken";
     try {
-      const data = await calculateAmount(accessToken, { number_of_shoot });
-      setBookingInfo(prev => ({ ...prev, amount: data.price.toString() }));
+      const data = await calculateAmount({
+        number_of_shoot: shoots,
+      });
+      setBookingInfo({ ...bookingInfo, amount: data.price.toString() });
     } catch (error) {
       console.error("Failed to calculate amount:", error);
-      setBookingInfo(prev => ({ ...prev, amount: "Error calculating price" }));
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // Pre-fill the amount as empty when the component mounts or number of shoots is zero
+    if (!bookingInfo.number_of_shoot) {
+      setBookingInfo({ ...bookingInfo, amount: "" });
+    }
+  }, [bookingInfo.number_of_shoot, setBookingInfo]);
 
   return (
     <div className="w-full flex flex-col gap-4">
@@ -75,7 +81,7 @@ const BookingProcessOne = ({
             type="text"
             id="amount"
             name="amount"
-            value={loading ? "Calculating..." : bookingInfo.amount}
+            value={loading ? "Calculating..." : bookingInfo.amount || ''}
             disabled
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
