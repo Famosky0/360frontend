@@ -18,27 +18,27 @@ const BookingProcessOne = ({
   const handleChange = (e: any) => {
     let name = e.target.name;
     let value = e.target.value;
-    setBookingInfo({ ...bookingInfo, [name]: value });
+    setBookingInfo({ ...bookingInfo, [name]: value });   
   };
 
   const getUserProfile = async () => {
     let data = [];
     const accessToken = localStorage.getItem("accessToken");
+    console.log("token: " + accessToken);
     if (accessToken) {
       data = await retrieveProfile(accessToken);
+      console.log(data);
       if (data) {
         setProfile(data);
       }
     } else {
-      data = await retrieveProfile("defaultToken");
+      data = await retrieveProfile("string");
     }
   };
 
   useEffect(() => {
     getUserProfile();
   }, []);
-
-
   return (
     <div className="w-full flex flex-col gap-4">
       <div className="w-full flex flex-col gap-2">
