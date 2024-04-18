@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { bookingSchema } from "../Interface";
 import { calculateAmount } from "@/services/request";
 import Loader from "@/Loader/Loader";
@@ -13,37 +13,29 @@ const BookingProcessOne = ({
   bookingInfo: bookingSchema;
 }) => {
   const handleChange = (e: any) => {
-    let name = e.target.name;
-    let value = e.target.value;
-    setBookingInfo({ ...bookingInfo, [name]: value });
+    const { name, value } = e.target;
+    setBookingInfo(prev => ({ ...prev, [name]: value }));
+    if (name === "number_of_shoot" && parseInt(value) > 0) {
+      calculateShootAmount(parseInt(value));
+    }
   };
 
   const [loading, setLoading] = useState(false);
 
-  const calculateShootAmount = async () => {
-    if (bookingInfo.number_of_shoot > 0) {
-      const accessToken = localStorage.getItem("accessToken") || "defaultAccessToken";
-      setLoading(true);
-      try {
-        const data = await calculateAmount(accessToken, {
-          number_of_shoot: bookingInfo["number_of_shoot"],
-        });
-        setBookingInfo({ ...bookingInfo, amount: data.price });
-      } catch (error) {
-        console.error("Failed to calculate amount:", error);
-      } finally {
-        setLoading(false);
-      }
+  // Triggered whenever number of shoots changes
+  const calculateShootAmount = async (number_of_shoot: number) => {
+    setLoading(true);
+    const accessToken = localStorage.getItem("accessToken") || "defaultAccessToken";
+    try {
+      const data = await calculateAmount(accessToken, { number_of_shoot });
+      setBookingInfo(prev => ({ ...prev, amount: data.price.toString() }));
+    } catch (error) {
+      console.error("Failed to calculate amount:", error);
+      setBookingInfo(prev => ({ ...prev, amount: "Error calculating price" }));
+    } finally {
+      setLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (bookingInfo.number_of_shoot > 0) {
-      calculateShootAmount();
-    } else {
-      setBookingInfo({ ...bookingInfo, amount: "" }); // Clear amount when shoots are not specified
-    }
-  }, [bookingInfo.number_of_shoot]);
 
   return (
     <div className="w-full flex flex-col gap-4">
@@ -53,19 +45,18 @@ const BookingProcessOne = ({
 
       <form className="flex flex-col gap-5 mt-8">
         <div className="flex flex-col gap-1">
-          <label htmlFor="full_name">Shoot Type</label>
+          <label htmlFor="shoot_type">Shoot Type</label>
           <select
             name="shoot_type"
             id="shoot_type"
-            value={bookingInfo["shoot_type"]}
+            value={bookingInfo.shoot_type}
             onChange={handleChange}
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           >
-            <option>OUTDOOR</option>
-            <option>INDOOR</option>
+            <option value="OUTDOOR">OUTDOOR</option>
+            <option value="INDOOR">INDOOR</option>
           </select>
         </div>
-
         <div>
           <label htmlFor="no_of_shoot">Number of Shoot</label>
           <input
@@ -74,34 +65,31 @@ const BookingProcessOne = ({
             name="number_of_shoot"
             value={bookingInfo.number_of_shoot}
             onChange={handleChange}
-            placeholder="e.g., 20"
+            placeholder="e.g 20"
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
         </div>
-
         <div>
           <label htmlFor="amount">Amount</label>
           <input
             type="text"
             id="amount"
             name="amount"
-            value={bookingInfo["amount"] || (bookingInfo.number_of_shoot > 0 ? 'Calculating...' : '')}
+            value={loading ? "Calculating..." : bookingInfo.amount}
             disabled
             className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
           />
-          {loading && <Loader />}
         </div>
-
-        {bookingInfo["shoot_type"].toLowerCase() === "outdoor" && (
+        {bookingInfo.shoot_type.toLowerCase() === "outdoor" && (
           <div>
             <label htmlFor="location">Location</label>
             <input
               type="text"
               id="location"
               name="location"
-              value={bookingInfo["location"]}
+              value={bookingInfo.location}
               onChange={handleChange}
-              placeholder="e.g., Lagos"
+              placeholder="e.g Lagos"
               className="w-full bg-white rounded-md min-h-12 mt-1.5 p-2 text-black"
             />
           </div>
