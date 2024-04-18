@@ -47,7 +47,7 @@ const BookingProcessOne = ({ profile }) => {
           />
         </div>
         <div>
-          <label htmlFor="password">Date</label>
+          <label htmlFor="password">Date of your shoot</label>
           <input
             type="date"
             id="date"
