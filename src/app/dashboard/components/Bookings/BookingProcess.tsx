@@ -27,7 +27,7 @@ const BookingProcess = ({
 }) => {
   const [bookingInfo, setBookingInfo] = useState<bookingSchema>({
     phone: "",
-    plan: "JASPER",
+    
     shoot_type: "OUTDOOR",
     location: "",
     number_of_shoot: 0,
@@ -52,7 +52,7 @@ const BookingProcess = ({
   useEffect(() => {
     if (
       bookingInfo["phone"] &&
-      bookingInfo["plan"] &&
+      
       bookingInfo["shoot_type"] &&
       bookingInfo["number_of_shoot"] &&
       bookingInfo["shooting_date"] &&
