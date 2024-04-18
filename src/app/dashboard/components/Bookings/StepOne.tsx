@@ -43,7 +43,7 @@ const BookingProcessOne = ({
   return (
     <div className="w-full flex flex-col gap-4">
       <div className="w-full flex flex-col gap-2">
-        <h1 className="text-3xl text-primary">Create Bookings</h1>
+        <h1 className="text-3xl text-primary">CreateBookings</h1>
       </div>
 
       <form className="flex flex-col gap-5 mt-8">
